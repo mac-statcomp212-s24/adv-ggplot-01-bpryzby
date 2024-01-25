@@ -46,6 +46,12 @@ You will need to use reference pages and documentation to discover necessary too
 
 ```{r}
 # Code for loading packages and reading in data
+library(tidyverse) 
+weather <- read_csv("https://lmyint.github.io/212_spring_2024/data/sfo_weather.csv")
+
+months_starts <- weather %>% 
+  filter(Day == 1) %>% 
+  filter(Month != 1)
 ```
 
 
@@ -55,6 +61,19 @@ You will need to use reference pages and documentation to discover necessary too
 ```{r}
 # Code for recreating the visualization
 # Use as many code chunks as you need to organize your work well
+ggplot(weather) +
+  geom_vline(data = months_starts, aes(xintercept=dateInYear), lty = "dashed", color = "#ECEBE3") +
+    geom_linerange(aes(x = dateInYear, ymin=RecordLow, ymax=RecordHigh), color = "#ECEBE3", linewidth = 1.5) + 
+    geom_linerange(aes(x= dateInYear, ymin=NormalLow, ymax=NormalHigh), color = "#C8B8BA", linewidth = 1.5) + 
+    geom_linerange(aes(x=dateInYear, ymin=Low, ymax=High), color = "#A90248", linewidth = 1.5) + 
+    scale_x_continuous(breaks=c(15, 46, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349), 
+                       labels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) + 
+  ggtitle("SFO Weather in 2011") + 
+  theme_classic() +
+  theme(axis.ticks.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.title.x = element_blank(),
+        plot.title = element_text(hjust = 0.5))
 ```
 
 
