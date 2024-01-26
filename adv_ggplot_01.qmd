@@ -47,14 +47,22 @@ You will need to use reference pages and documentation to discover necessary too
 ```{r}
 # Code for loading packages and reading in data
 library(tidyverse) 
+library(ggpubr)
 weather <- read_csv("https://lmyint.github.io/212_spring_2024/data/sfo_weather.csv")
 
 months_starts <- weather %>% 
   filter(Day == 1) %>% 
   filter(Month != 1)
 
+month_ends <- weather %>% 
+  group_by(Month) %>% 
+  filter(Day == max(Day))
+
 record <- weather %>% 
   filter(Record == TRUE)
+
+recordPrec <- weather %>% 
+  filter(RecordP == TRUE)
 ```
 
 
@@ -64,16 +72,16 @@ record <- weather %>%
 ```{r}
 # Code for recreating the visualization
 # Use as many code chunks as you need to organize your work well
-ggplot(weather) +
-  geom_vline(data = months_starts, aes(xintercept=dateInYear), lty = "dashed", color = "#ECEBE3") +
+a <- ggplot(weather) +
+  geom_vline(data = months_starts, aes(xintercept=dateInYear), lty = "dashed", color = "#ECEBE3", linewidth = 0.3) +
   geom_linerange(aes(x = dateInYear, ymin=RecordLow, ymax=RecordHigh), color = "#ECEBE3", linewidth = 1.5) + 
   geom_linerange(aes(x= dateInYear, ymin=NormalLow, ymax=NormalHigh), color = "#C8B8BA", linewidth = 1.5) + 
   geom_linerange(aes(x=dateInYear, ymin=Low, ymax=High), color = "#A90248", linewidth = 1.5) + 
   geom_point(data = record, aes(x=dateInYear, y=High), shape = 25, fill = 'black', size = 1.5) + 
   geom_text(data = record, aes(x=dateInYear, y=High+10, label = RecordText), size = 1.5) + 
-  geom_text(aes(x=30, y=130, label = "Temperature")) + 
+  geom_text(aes(x=17, y=130, label = "Temperature"), size = 2.5) + 
   scale_x_continuous(expand = c(0,0), breaks=c(15, 46, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349), 
-                       labels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"), limits = c(0,365)) + 
+                       labels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) + 
   scale_y_continuous(breaks= c(0, 40, 80, 120), limits = c(-20, 130)) + 
   ggtitle("SFO Weather in 2011") + 
   theme_classic() +
@@ -85,9 +93,26 @@ ggplot(weather) +
 ```
 
 ```{r}
-a
+b <- ggplot(weather) + 
+  geom_vline(data = months_starts, aes(xintercept=dateInYear), color = "#d0d0d0") +
+  geom_area(aes(x=dateInYear, y=CulmPrec), fill = "#ebeae2") + 
+  geom_line(aes(x=dateInYear, y=CulmPrec, group=Month), color = "#32a3d8") + 
+  geom_point(data = recordPrec, aes(x=dateInYear, y=CulmPrec), shape = 25, fill = 'black', size = 1.5) + 
+  geom_text(data = month_ends, aes(x=dateInYear, y=CulmPrec + 0.3, label = CulmPrec), hjust = 1, size = 3) + 
+  geom_text(aes(x=17, y=8, label = "Precipitation"), size = 2.6) +
+  scale_x_continuous(expand = c(0,0)) + 
+  scale_y_continuous(breaks = c(4,8), limits = c(0,8)) + 
+  theme_classic() + 
+  theme(axis.ticks.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.title.y = element_blank())
 ```
 
+```{r}
+ggarrange(a, b, nrow = 2, heights = c(1,0.33))
+```
 
 
 
