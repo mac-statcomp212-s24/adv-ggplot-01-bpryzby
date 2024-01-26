@@ -52,6 +52,9 @@ weather <- read_csv("https://lmyint.github.io/212_spring_2024/data/sfo_weather.c
 months_starts <- weather %>% 
   filter(Day == 1) %>% 
   filter(Month != 1)
+
+record <- weather %>% 
+  filter(Record == TRUE)
 ```
 
 
@@ -61,20 +64,30 @@ months_starts <- weather %>%
 ```{r}
 # Code for recreating the visualization
 # Use as many code chunks as you need to organize your work well
-ggplot(weather) +
+a <- ggplot(weather) +
   geom_vline(data = months_starts, aes(xintercept=dateInYear), lty = "dashed", color = "#ECEBE3") +
-    geom_linerange(aes(x = dateInYear, ymin=RecordLow, ymax=RecordHigh), color = "#ECEBE3", linewidth = 1.5) + 
-    geom_linerange(aes(x= dateInYear, ymin=NormalLow, ymax=NormalHigh), color = "#C8B8BA", linewidth = 1.5) + 
-    geom_linerange(aes(x=dateInYear, ymin=Low, ymax=High), color = "#A90248", linewidth = 1.5) + 
-    scale_x_continuous(breaks=c(15, 46, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349), 
-                       labels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) + 
+  geom_linerange(aes(x = dateInYear, ymin=RecordLow, ymax=RecordHigh), color = "#ECEBE3", linewidth = 1.5) + 
+  geom_linerange(aes(x= dateInYear, ymin=NormalLow, ymax=NormalHigh), color = "#C8B8BA", linewidth = 1.5) + 
+  geom_linerange(aes(x=dateInYear, ymin=Low, ymax=High), color = "#A90248", linewidth = 1.5) + 
+  geom_point(data = record, aes(x=dateInYear, y=High), shape = 25, fill = 'black', size = 1.5) + 
+  geom_text(data = record, aes(x=dateInYear, y=High+10, label = RecordText), size = 1.5) + 
+  scale_x_continuous(breaks=c(15, 46, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349), 
+                       labels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"), limits = c(0,365)) + 
+  scale_y_continuous(breaks= c(0, 40, 80, 120), limits = c(-20, 125)) + 
   ggtitle("SFO Weather in 2011") + 
+  ylab("Temperature") + 
   theme_classic() +
   theme(axis.ticks.x = element_blank(),
         axis.line.x = element_blank(),
         axis.title.x = element_blank(),
-        plot.title = element_text(hjust = 0.5))
+        plot.title = element_text(hjust = 0.5), 
+        axis.title.y = element_text(angle = 0, hjust = 1, face = "bold"))
 ```
+
+```{r}
+
+```
+
 
 
 
